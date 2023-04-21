@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.19
+# v0.19.25
 
 using Markdown
 using InteractiveUtils
@@ -33,7 +33,10 @@ html"""
 """
 
 # ╔═╡ c3db98d4-84a3-11ec-17c2-7510b678ee8a
-md"# Graficación de funciones y animaciones con _Plots_"
+md"""# Graficación de "funciones" y animaciones con _Plots_"""
+
+# ╔═╡ d0fbb143-c0d8-4d14-94f0-261cfa42fcbb
+
 
 # ╔═╡ b3f850d8-60d4-4798-9beb-d42a9cdac9ae
 md"## Graficación de funciones
@@ -101,7 +104,7 @@ md"  "
 
 # ╔═╡ d2472d6a-7072-49ae-ba55-207db17be3ca
 begin
-    l = 2          # ¡Cambia el valor de l y corre la celda,
+    l = .3# ¡Cambia el valor de l y corre la celda,
     plot(sin,0:l:2π) # y observa qué sucede con la gráfica!
 end
 
@@ -183,6 +186,18 @@ md""" **Ejercicio** Define un parámetro interactivo `d` que controle el nivel d
 
 """
 
+# ╔═╡ fc61c4a5-194c-42f7-bb3a-b4da34f864c0
+@bind d Slider(0.05:0.005:1, default=0.5)
+
+# ╔═╡ d0c3da56-cd1d-4dfc-bdd5-bff4d81668d6
+d
+
+# ╔═╡ 350ff982-9875-473f-b2f9-a2ea42b77b3a
+begin
+	plot(sin,-π:d:π, title = "Funciones trigonométricas", xlabel = "x", ylabel = "y", color = "pink", label = "\$\\sin(x)\$")
+    plot!(cos,-π:d:π, color = "blue", label = "\$\\cos(x)\$",)
+end
+
 # ╔═╡ acfe0334-c7aa-471f-b39e-8276e2e3dd42
 md"""#### El paquete `LaTeXStrings`
 
@@ -200,6 +215,15 @@ md"""Luego, podemos escribir el String anterior simplemente como (¡inténtalo!)
 `L"\sin(x)"` 
 
 Es decir, si escribimos la letra `L` antes del inicio del String y el paquete LaTeXStrings está cargado, Julia interpretará el contenido del String utilizando LaTeX."""
+
+# ╔═╡ 7a5dde92-ff66-497b-9ec4-e73f0af1bf34
+L"\sin(x)"
+
+# ╔═╡ 43c0d35d-19ca-4c4f-9492-df6f774d7825
+L"\cos(x)"
+
+# ╔═╡ d8770a7b-bf9e-4d65-b510-5e7142d94d63
+L"\pi"
 
 # ╔═╡ 1907f78f-e429-4a77-a90e-c9ebb94d6385
 md"""
@@ -222,7 +246,7 @@ Por ejemplo:
 """
 
 # ╔═╡ 18368069-bf83-48e9-a6df-a2b5e6181277
-quiver([1,1.5,3], [3,2,1],quiver=([-0.5,1,-1],[-1,1,0.5]))
+quiver([1,1.5,3,2.5], [3,2,1],quiver=([-0.5,1,-1],[-1,1,0.5]))
 
 #= Julia crea una figura bidimensional,
 
@@ -235,6 +259,10 @@ quiver([1,1.5,3], [3,2,1],quiver=([-0.5,1,-1],[-1,1,0.5]))
    grafica una flecha con coordenadas [-1,0.5] tomando
    como origen al punto [1,3].
 =#
+
+# ╔═╡ e442fddb-c77f-4c4b-b90e-2a9eb2fa1413
+md"Notita para mi: Si agregamos un número más en un conjunto se tomarán los números del principio de los demás conjuntos
+se empieza en [2.5,3]y se le suma [-0.5,-1] entonces termina en [2,2]"
 
 # ╔═╡ ec3dfa07-89c8-48a3-adaf-021c311d2c0d
 md"""
@@ -254,7 +282,7 @@ y, después, ejecutamos la función `quiver` _reemplazando el tercer argumento p
 """
 
 # ╔═╡ 7c580a14-b5ec-4bb1-960b-fbce583a9b62
-quiver((-2:0.2:2)', (-2:0.2:2) , quiver=g, color=:green)
+quiver((-2:0.2:2)', (-2:0.2:2) , quiver=g, color=:"green")
 
 # ╔═╡ 8eac3ff8-f71a-41b2-a3b2-5d7965270cdf
 md"donde la apóstrofe `'` fue utilizada para transponer la matriz `(-2:0.2:2)`, pues un vector renglón es equivalente a una matriz de un renglón."
@@ -479,18 +507,80 @@ Sugerencia: Repasa las ecuaciones cinemáticaticas del tiro parabólico e invest
 # ╔═╡ 50f7f46b-081e-4b07-94af-1331b33a7c7f
 # Tu código (comentado) va aquí :D
 
+#ecuación paramétrica de la componente horizontal es x(t)=vcos(α)t
+# la componente vertical es y=vsen(α)t−(1/2)gt^2+H
+#Despejando t tenemos t=x/(v*cosα)
+#por lo que y=H+x tanα -4.9*(x/v*cosα)^2
+
+
+begin
+	H=1250
+	θ=35
+	r=1
+	t=4
+	
+	x1(x)=-(Vx*x)
+	y1(x)=(H+(Vy)*x-((9.81*r*x^2)/2))
+	
+	Vx=r*cos(θ)
+	Vy=r*sin(θ)
+
+    p(x)=(x1(x) , y1(x)) #Se grafica las coordenadas x y y
+	
+	@gif for t in 0:.2:5 
+	plot(p.(range(0, 5, step=1) .+t), legend=false, title="Tiro Parabólico", 
+	ls=:dot, lw=5; color="green", xlabel="Distancia", ylabel ="Altura")
+
+	scatter!([x1(t)],[y1(t)])	
+	
+	end
+end
+
 # ╔═╡ 59ec3890-303c-436a-8043-8e6bc9c427ed
 md"**Ejercicio** Crea una función que tome parámetros `h`, `r`, `θ` y `t`, y haga lo descrito en el Ejercicio anterior."
 
 # ╔═╡ c3264b4d-81b1-4e0c-9205-ff818665788c
 # Tu código (comentado) va aquí :D
+begin
+	function Parábola(H,r,t,θ)
+
+	x1(x)=-(Vx * x)
+	y1(x)=(H+(Vy)*x-((9.81*r*x^2)/2))
+	
+	Vx=r*cos(θ)
+	Vy=r*sin(θ)
+
+    p(x)=(x1(x) , y1(x))
+
+	parábola= @animate for t in 0:.2:5 	
+		plot(p.(range(0, 5, step=1) .+t), legend=false, title="Función de tiro parabólico", 
+		ls=:dot, lw=5; color="blue", xlabel="Distancia", ylabel="Altura" )	
+
+	scatter!([x1(t)],[y1(t)])
+	end
+		gif(Parábola,"Función de tiro parabólico.gif",fps=10)	
+	end	
+
+end
+	
 
 # ╔═╡ 77aacd79-26e3-40c2-ac22-f9121aac4155
-md"""**Ejercicio** Crea una animación de cómo la superficie obtenida de la función $h(x,y) = \cos(x) + \sin(y)$ se desplaza hacia el eje Y.
+md"""**Ejercicio** Crea una animación de cómo la superficie obtenida de la función $h(x,y) = \cos(x) + \sin(y)$ se desplaza hacia el eje vertical.
 """
 
 # ╔═╡ 4e68ad0c-17ef-41f7-b9fe-8561415bb7f2
 # Tu código (comentado) va aquí :D
+begin
+n = 200
+x = range(0,20,length = n)
+y = x
+
+@gif for i in range(0,2π,length=n)
+	hn(x,y)=cos(x)+ sin(y +10cos(i))
+	p=plot(x,y,hn, st=:surface)
+	default(legend=false, xlabel="x", ylabel= "y", title = "Gráfica cos(x)+sen(y)")
+    end
+end	
 
 # ╔═╡ 88299b4d-2a7d-4c18-956e-c6e75473c658
 md" ## Recursos complementarios
@@ -520,7 +610,7 @@ PlutoUI = "~0.7.38"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.4"
+julia_version = "1.8.5"
 manifest_format = "2.0"
 project_hash = "77e2734aeac55d5109eeed492b1ea958eae44caf"
 
@@ -1446,7 +1536,8 @@ version = "0.9.1+5"
 
 # ╔═╡ Cell order:
 # ╟─967d628f-d940-45ae-ad80-947b15d8c099
-# ╟─c3db98d4-84a3-11ec-17c2-7510b678ee8a
+# ╠═c3db98d4-84a3-11ec-17c2-7510b678ee8a
+# ╟─d0fbb143-c0d8-4d14-94f0-261cfa42fcbb
 # ╠═33f8289b-3e80-48a1-8a2c-ef6d2d2f107e
 # ╟─b3f850d8-60d4-4798-9beb-d42a9cdac9ae
 # ╟─8c5b9695-3625-4105-8a4f-9358e208115c
@@ -1475,11 +1566,18 @@ version = "0.9.1+5"
 # ╠═fc94b6e8-cae9-46bc-9ac4-9cee5e86c8ee
 # ╟─77a60b5d-ad7f-4c44-a68d-694417619668
 # ╟─8b8aff3c-3d88-4022-bc86-b75ebefde2a3
+# ╠═fc61c4a5-194c-42f7-bb3a-b4da34f864c0
+# ╠═d0c3da56-cd1d-4dfc-bdd5-bff4d81668d6
+# ╠═350ff982-9875-473f-b2f9-a2ea42b77b3a
 # ╟─acfe0334-c7aa-471f-b39e-8276e2e3dd42
 # ╠═8302701b-02ac-4d35-b7de-5dec8fe701fb
 # ╟─02f9778e-21c8-42db-bed6-95a20d592f22
+# ╠═7a5dde92-ff66-497b-9ec4-e73f0af1bf34
+# ╠═43c0d35d-19ca-4c4f-9492-df6f774d7825
+# ╠═d8770a7b-bf9e-4d65-b510-5e7142d94d63
 # ╟─1907f78f-e429-4a77-a90e-c9ebb94d6385
 # ╠═18368069-bf83-48e9-a6df-a2b5e6181277
+# ╠═e442fddb-c77f-4c4b-b90e-2a9eb2fa1413
 # ╟─ec3dfa07-89c8-48a3-adaf-021c311d2c0d
 # ╠═73d1cb8f-4fc5-4a11-885d-9bc97ecd73d9
 # ╟─324cf67f-7cf1-4613-b072-aff38958612f
