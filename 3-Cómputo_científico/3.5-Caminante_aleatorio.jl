@@ -275,25 +275,22 @@ md"**Ejercicio** Crea una función `animaCaminata` que
 * tome como entrada un arreglo -que supondremos que simula una caminata aleatoria en una dimensión- y
 * devuelva como salida una *animación* de la caminata. (Sugerencia: Usa tu función `graficaCaminata`.)"
 
-# ╔═╡ 7a0b1904-17e8-4cce-af17-70182a27da49
-# Tu código (comentado) va aquí :)
+# ╔═╡ e9caf67b-7701-42d7-9470-cff166e66051
 begin
-function animaCaminata(caminata::Array{Int})
-    num_pasos = length(caminata)
-    posiciones = caminata
-    
-    anim = Animation()
-    p = plot(1:num_pasos, posiciones, xlabel = "Número de pasos", ylabel = "Posición", legend = false)
-    push!(anim, p)
-    
-    for i in 2:num_pasos
-        p = plot(1:i, posiciones[1:i], xlabel = "Número de pasos", ylabel = "Posición", legend = false)
-        push!(anim, p)
-    end
-    
-    return anim
+	#definiciones
+	n5=12
+	funcion_caminata=caminataAleatoria(n5)
+	Animacion_de_caminata=(funcion_caminata)
+	
+	function animaCaminata(funcion_caminata)
+		n=length(funcion_caminata)
+		Animacion=@animate for i in 1:n
+			grafica(función_caminata[1:i])
+		end
+		return Animacion
+	end
+gif(Animacion_de_caminata=(funcion_caminata), "animaCaminata.gif",fps=20)
 end
-end	
 
 # ╔═╡ 24490a53-4b2b-49bd-bf9d-f8994ed6a3a7
 md"""### Caminante aleatorio en dos dimensiones
@@ -306,6 +303,27 @@ md""" **Ejercicio** Crea una función `caminataAleatoria2D` que
 * tome como entrada un número de pasos `n` y
 * devuelva como salida un arreglo con dos subarreglos que tengan `n+1` "posiciones" cada uno -uno de posiciones horizontales y otro de posiciones verticales, incluyendo las posiciones iniciales `0` en cada caso-, simulando una caminata aleatoria.
 Utiliza tu función `aleatorioUniforme` para generar números aleatorios en el intervalo $[-1,1]$ y suma números generados por esta función a las posiciones horizontales y verticales para simular un paso continuo en dos dimensiones."""
+
+# ╔═╡ d1c6a096-583d-4f85-b2cd-89d227311c1d
+# Tu código (comentado) va aquí :)
+begin
+	function caminataAleatoria2D(n)
+		horizontal=zeros(n+1)                       #ceros en el eje x
+		vertical=zeros(n+1)                         #ceros en el eje y
+		for i in 2:n+1
+	      pasoh, pasov = aleatorioUniforme(-1,1), aleatorioUniforme(-1,1)           
+			        #paso en el eje horizontal y paso en el eje vertical
+            
+			horizontal[i]= horizontal[i-1] + pasoh
+			vertical[i]= vertical[i-1] + pasov
+		end
+		return [horizontal, vertical]
+	end
+end
+		
+
+# ╔═╡ 1c291fae-b070-49bc-a343-4a67002d9bbb
+caminataAleatoria2D(8)
 
 # ╔═╡ 893d49c4-ab84-4c57-a9e3-54116575ade3
 md"""**Ejercicio** Crea una función `graficaCaminata2D` que
@@ -321,20 +339,21 @@ Luego, en una celda aparte, define una variable `n3` como un número entero posi
 # ╔═╡ d292165a-b37b-47a6-a61e-dbdafbf1f928
 # Tu código (comentado) va aquí :)
 begin
-	function graficaCaminata2D(simulación_de_caminata::Array{Array{Float64, 1}, 1})
-		horizontal=simulación_de_caminata[1]
-		vertical=simulación_de_caminata[2]
+	function graficaCaminata2D(camino)
+		horizontal=[p[1] for p in camino]
+		vertical=[p[2] for p in camino]
 		#Generamos una gráfica
-		plot(horizontal, vertical, legend=false, xlabel!("Horizontal"), ylabel!("Vertical"), title!("Gráfica de caminata aleatoria2D"))
+		plot(horizontal, vertical, linestyle=:dash, legend=false, xlabel!("Horizontal"), ylabel!("Vertical"), title!("Gráfica de caminata aleatoria2D"))
 			end
 end
 		
 
-# ╔═╡ 69ae1d5c-d650-41b4-9e79-6cbdc0122ce9
-Pasos=[[0.0,4.6,1.3,4.0,2.7],[0.0,3.2,5.0,2.6,1.8]]
-
-# ╔═╡ 70c5c472-da9f-43cc-9ba6-b0fe39091808
-graficaCaminata2D(Pasos)
+# ╔═╡ 8f85df46-56ba-4f1c-9d69-d274c56fdb02
+begin
+	N6=15
+	camino=caminataAleatoria2D(N6)
+	graficaCaminata2D(camino)
+end
 
 # ╔═╡ eb7afba3-6d48-4406-8ac7-75521a965a14
 md"**Ejercicio** Crea una función `graficaCaminata2D!` que sea una versión modificadora de la función anterior. Luego, genera una gráfica con 5 caminatas aleatorias en dos dimensiones (espaciales).
@@ -344,6 +363,25 @@ md"**Ejercicio** Crea una función `graficaCaminata2D!` que sea una versión mod
 # Tu código (comentado) va aquí :)
 
 # ╔═╡ 1a4fe42b-cef8-4f0e-91a4-c7733dd694cb
+begin
+	n7=15
+	function graficaCaminata2D!(camino1,g)
+		horizontal=[p[1] for p in camino1]
+		vertical=[p[2] for p in camino1]
+		#Generamos una gráfica
+		plot!(g, horizontal, vertical, linestyle=:dash)
+		display(g)
+	end
+
+	    #definimos la gráfica
+	g=plot(legend=false, xlabel!("Horizontal"), ylabel!("Vertical"), title!("Gráfica de 5 caminatas"))
+
+	for i=1:5
+		camino1=caminataAleatoria2D(n7)
+        graficaCaminata2D!(camino1,g)
+	end
+	g
+end
 
 
 # ╔═╡ ec2b4750-3522-4c26-87ff-06b0b2e3b5d6
@@ -352,19 +390,61 @@ md"**Ejercicio** Crea una función `animaCaminata2D` que
 * devuelva como salida una *animación* de la caminata. (Sugerencia: Usa tu función `graficaCaminata2D`.)"
 
 # ╔═╡ f08b6ef6-65c1-4b53-ba50-128e589f70ee
-# Tu código (comentado) va aquí :)
+begin
+function animaCaminata2D(simulacion_caminata::Array{Array{Float64, 1}, 1})
+    horizontal = [p[1] for p in simulacion_caminata]
+    vertical = [p[2] for p in simulacion_caminata]
+    
+    anim = @animate for i in 1:length(horizontal)
+        graficaCaminata2D(simulacion_caminata[1:i])
+    end
+    
+    return anim
+end
+end
+
+# ╔═╡ a3a0553d-7c83-4c76-8b10-8e71b98136ff
+begin
+caminata_2D = [[0.0, 1.0, 1.0, 0.0, -1.0, -1.0, -2.0], [0.0, 1.0, 2.0, 2.0, 1.0, 0.0, 0.0]]
+animacion_2D = animaCaminata2D(caminata_2D)
+end
 
 # ╔═╡ ef1706ee-85dc-422b-98fa-aa43f75ae098
 md"**Ejercicio** ¡Haz una caminata aleatoria en tres dimensiones espaciales y grafícala! (Así se modelan, por ejemplo, las partículas en un gas)." 
 
-# ╔═╡ 1c291fae-b070-49bc-a343-4a67002d9bbb
-caminataAleatoria2D(4)
+# ╔═╡ 48e666c6-3a29-4ebb-993f-06696a49b025
+# Tu código (comentado) va aquí :)
+function caminataAleatoria3D(n::Int)
+    x = zeros(n+1)
+    y = zeros(n+1)
+    z = zeros(n+1)
+    
+    for i in 2:n+1
+        paso_x = aleatorioUniforme(-1, 1)
+        paso_y = aleatorioUniforme(-1, 1)
+        paso_z = aleatorioUniforme(-1, 1)
+        
+        x[i] = x[i-1] + paso_x
+        y[i] = y[i-1] + paso_y
+        z[i] = z[i-1] + paso_z
+    end
+    
+    return [x, y, z]
+end
 
-# ╔═╡ c0a85f88-2909-4432-b476-ad91096752eb
+# ╔═╡ 59f25591-7a43-4545-9319-94e85c237027
 begin
-	n4=5
-	graficaCaminata2D(caminataAleatoria2D(n4))
-end	
+function graficaCaminata3D(camino)
+    x = camino[1]
+    y = camino[2]
+    z = camino[3]
+    
+    scatter3d(x, y, z, legend=false, xlabel="X", ylabel="Y", zlabel="Z", title="Caminata aleatoria 3D")
+end
+n8 = 10
+caminata_3D = caminataAleatoria3D(n8)
+graficaCaminata3D(caminata_3D)
+end
 
 # ╔═╡ 9bdee65a-5b90-4e1f-aec8-9939ba1c32e3
 md""" #### Nota final
@@ -382,43 +462,6 @@ md""" ## Recursos complementarios
 md""" ## Créditos
 Este _notebook_ de Pluto fue basado parcialmente en los _notebooks_ de Jupyter `4. Caminatas aleatorias.ipynb` y `Tarea 1.ipynb` del repositorio [`FisicaComputacional2019_3`](https://github.com/dpsanders/FisicaComputacional2019_3/) del Dr. David Philip Sanders. 
 """
-
-# ╔═╡ d1c6a096-583d-4f85-b2cd-89d227311c1d
-# Tu código (comentado) va aquí :)
-begin
-	function caminataAleatoria2D(n::Int)
-		horizontal=zeros(n+1)
-		vertical=zeros(n+1)
-		for i in 2:n+1
-			pasoh= aleatorioUniforme(-1,1)          #paso en el eje horizontal
-			pasov= aleatorioUniforme(-1,1)          #paso en el eje vertical
-            
-			horizontal[i]= horizontal[i-1] + pasoh
-			vertical[i]= vertical[i-1] + pasov
-		end
-		return [horizontal, vertical]
-	end
-end
-		
-
-# ╔═╡ 48e666c6-3a29-4ebb-993f-06696a49b025
-# Tu código (comentado) va aquí :)
-begin
-	function caminataAleatoria2D(n::Int)
-		horizontal=zeros(n+1)
-		vertical=zeros(n+1)
-			ejez=zeros(n+1)
-				for i in 2:n+1
-					pasoh= aleatorioUniforme(-1,1)          #paso en el eje horizontal
-					pasov= aleatorioUniforme(-1,1)          #paso en el eje vertical
-					pasoz= aleatorioUniforme(-1,1)          #paso en el eje z
-					horizontal[i]= horizontal[i-1] + pasoh
-					vertical[i]= vertical[i-1] + pasov
-					ejez[i]=ejez[i-1] + pasoz
-			end
-			return [horizontal, vertical,ejez]
-	end
-end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1401,23 +1444,23 @@ version = "1.4.1+0"
 # ╠═3e8880cc-a4af-4a2b-8c10-4ce92bfefd2b
 # ╠═4ef168c6-c1ee-4dd4-8523-71ada9a6a3eb
 # ╟─75d3a337-a3b2-4319-bd1b-72d2642caef7
-# ╠═7a0b1904-17e8-4cce-af17-70182a27da49
+# ╠═e9caf67b-7701-42d7-9470-cff166e66051
 # ╟─24490a53-4b2b-49bd-bf9d-f8994ed6a3a7
 # ╟─09361d57-7c4c-4832-afc4-edf6f8819368
 # ╠═d1c6a096-583d-4f85-b2cd-89d227311c1d
 # ╠═1c291fae-b070-49bc-a343-4a67002d9bbb
 # ╟─893d49c4-ab84-4c57-a9e3-54116575ade3
 # ╠═d292165a-b37b-47a6-a61e-dbdafbf1f928
-# ╠═69ae1d5c-d650-41b4-9e79-6cbdc0122ce9
-# ╠═70c5c472-da9f-43cc-9ba6-b0fe39091808
-# ╠═c0a85f88-2909-4432-b476-ad91096752eb
+# ╠═8f85df46-56ba-4f1c-9d69-d274c56fdb02
 # ╟─eb7afba3-6d48-4406-8ac7-75521a965a14
 # ╠═ff3c8595-0466-412e-b20b-30336916f573
 # ╠═1a4fe42b-cef8-4f0e-91a4-c7733dd694cb
 # ╟─ec2b4750-3522-4c26-87ff-06b0b2e3b5d6
 # ╠═f08b6ef6-65c1-4b53-ba50-128e589f70ee
+# ╠═a3a0553d-7c83-4c76-8b10-8e71b98136ff
 # ╟─ef1706ee-85dc-422b-98fa-aa43f75ae098
 # ╠═48e666c6-3a29-4ebb-993f-06696a49b025
+# ╠═59f25591-7a43-4545-9319-94e85c237027
 # ╟─9bdee65a-5b90-4e1f-aec8-9939ba1c32e3
 # ╟─8a5ab06a-12c5-4966-ba10-6d33e920f730
 # ╟─74e480de-ae20-46ca-a65a-6fb8db3fc202
